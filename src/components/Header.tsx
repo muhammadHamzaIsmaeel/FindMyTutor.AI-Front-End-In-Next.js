@@ -1,41 +1,48 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
+import { Button } from "./ui/button";
 
 export default function Header() {
-  const { user } = useUser();
-  const [role, setRole] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const cookieRole = document.cookie.split("; ").find(r => r.startsWith("role="))?.split("=")[1];
-    setRole(cookieRole || (user?.unsafeMetadata?.role as string));
-  }, [user]);
-
+  const { user, isSignedIn } = useUser();
+  const role = user?.unsafeMetadata?.role as string | undefined;
   const isTeacher = role === "teacher";
 
   return (
-    <header className="flex justify-between items-center px-4 md:px-6 h-16 shadow-sm bg-white">
-      <Link href="/" className="text-2xl font-bold text-indigo-600">FindMyTutor.AI</Link>
-      <nav className="flex gap-2 items-center">
-        <Link href="/find">
-          <Button variant="ghost" className="text-indigo-600 hover:bg-indigo-100">Find Tutors</Button>
-        </Link>
+    <header className="flex items-center justify-between px-6 py-4 bg-white text-black shadow-md">
+      {/* Left side Logo */}
+      <Link href="/" className="text-2xl font-bold">
+        FindMyTutor.AI
+      </Link>
+
+      {/* Right side Menu */}
+      <nav className="flex items-center space-x-6">
+
         {isTeacher && (
           <Link href="/tutor-dashboard">
-            <Button className="bg-indigo-600 text-white hover:bg-indigo-700">Dashboard</Button>
+            <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
+              Dashboard
+            </Button>
           </Link>
         )}
+
+        {/* User Auth Buttons */}
         <SignedOut>
-          <SignInButton>
-            <Button variant="outline" className="text-indigo-600 border-indigo-600 hover:bg-indigo-100">Sign In</Button>
-          </SignInButton>
-          <SignUpButton>
-            <Button className="bg-green-600 text-white hover:bg-green-700">Sign Up</Button>
-          </SignUpButton>
+          <Link
+            href="/sign-in"
+            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/sign-up"
+            className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700"
+          >
+            Sign Up
+          </Link>
         </SignedOut>
+
         <SignedIn>
           <UserButton afterSignOutUrl="/" />
         </SignedIn>
